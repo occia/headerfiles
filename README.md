@@ -18,6 +18,44 @@ headerfiles.api
 
 ```
 
+# Support List
+
+- [] bitcoin-core
+- [] bluez
+- [] brpc
+- [] geos
+- [] gnutls
+- [] hostap
+- [] ibmswtpm2
+- [] igraph
+- [] knot-dns
+- [] krb5
+- [x] libfdk-aac
+- [x] libfuse
+- [x] libpsl
+- [x] libsodium
+- [] libtasn1
+- [] libyal
+- [] mdbtools
+- [] mosh
+- [] njs
+- [] opendnp3
+- [] openexr
+- [] pcre2
+- [] piex
+- [] proj4
+- [] protobuf-c
+- [] quickjs
+- [] resiprocate
+- [] rnp
+- [] spirv-tools
+- [] util-linux
+- [] varnish
+- [] wget
+- [] wget2
+- [] xs
+- [] znc
+
 # test
 
 ```bash
