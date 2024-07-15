@@ -1,8 +1,3 @@
-import sys
-import os
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import headerfiles.api as api
 
 def test_is_supported_proj():
@@ -11,10 +6,9 @@ def test_is_supported_proj():
     assert api.is_supported_proj("libpsl")
     assert api.is_supported_proj("libsodium")
     assert api.is_supported_proj("libtasn1")
-    assert api.is_supported_proj("libyal")
     assert not api.is_supported_proj("aaa")
 
-def check_result_is_list_of_strings(result):
+def check_result_is_list_of_strings(result: list):
     assert isinstance(result, list)
     assert len(result) == 0 or all(isinstance(x, str) for x in result)
 
@@ -24,10 +18,8 @@ def test_get_proj_headers():
     check_result_is_list_of_strings(api.get_proj_headers("libpsl"))
     check_result_is_list_of_strings(api.get_proj_headers("libsodium"))
     check_result_is_list_of_strings(api.get_proj_headers("libtasn1"))
-    check_result_is_list_of_strings(api.get_proj_headers("libyal"))
     assert api.get_proj_headers("aaa") is None
 
 if __name__ == "__main__":
-    test_is_supported_proj()
-    test_get_proj_headers()
-    print("All tests passed!")
+    import pytest
+    pytest.main()

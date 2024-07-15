@@ -2,16 +2,24 @@ from setuptools import setup, find_packages
 
 setup(
     name='headerfiles',
-    version='0.0.1',
+    version='0.1',
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-	    # add deps here
+        # add deps here
         'click',
     ],
     entry_points={
         'console_scripts': [
-            'headerfiles-cli=headerfile.cli:cli',
+            'headerfiles-cli=headerfiles.cli:cli',
+        ],
+    },
+    package_data={
+        'headerfiles' : ['data/headerfiles.json'],
+    },
+    extras_require={
+        'dev': [
+            'pytest',
         ],
     },
     author='Cen Zhang',
@@ -22,8 +30,7 @@ setup(
     url='https://github.com/occia/headerfiles',
     classifiers=[
         'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.7',
 )

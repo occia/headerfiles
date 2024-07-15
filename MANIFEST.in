@@ -2,5 +2,4 @@ include README.md
 include LICENSE
 include setup.py
 graft headerfiles
-graft data 
 prune tests
