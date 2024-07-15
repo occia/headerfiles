@@ -56,7 +56,7 @@ headerfiles.api
 - [] xs
 - [] znc
 
-# test
+# Test
 
 ```bash
 python3 -m tests.test_api

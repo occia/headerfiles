@@ -4,9 +4,16 @@ setup(
     name='headerfiles',
     version='0.0.1',
     packages=find_packages(),
+    include_package_data=True,
     install_requires=[
-	# add deps here
+	    # add deps here
+        'click',
     ],
+    entry_points={
+        'console_scripts': [
+            'headerfiles-cli=headerfile.cli:cli',
+        ],
+    },
     author='Cen Zhang',
     author_email='blbllhy@gmail.com',
     description='Header files inference for C/C++ projects',
