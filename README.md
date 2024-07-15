@@ -61,17 +61,3 @@ headerfiles.api
 ```bash
 python3 -m tests.test_api
 ```
-
-# Dev Usage
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -e .
-headerfiles-cli --help
-#...
-headerfiles-cli supp libpsl
-headerfiles-cli infer libpsl
-#...
-pip uninstall headerfiles -y
-```
