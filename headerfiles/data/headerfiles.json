@@ -1,29 +1,18 @@
 {
 	"libfdk-aac": [
 		"aacdecoder_lib.h",
-
 		"aacenc_lib.h",
-
 		"ac_arith_coder.h",
-
 		"FDK_drcDecLib.h",
-
 		"tpdec_lib.h",
-
 		"tpenc_lib.h",
-
 		"pcm_utils.h",
 		"pcmdmx_lib.h",
 		"limiter.h",
-
 		"sac_dec_lib.h",
-
 		"sacenc_lib.h",
-
 		"sbrdecoder.h",
-
 		"sbr_encoder.h",
-
 		"FDK_audio.h",
 
 		"FDK_lpc.h",
@@ -249,71 +238,7 @@
 		"uniwbrk.h"
 	],
 	"libsodium": [
-		"sodium/crypto_stream_chacha20.h",
-		"sodium/randombytes_sysrandom.h",
-		"sodium/private/chacha20_ietf_ext.h",
-		"sodium/crypto_kdf.h",
-		"sodium/crypto_aead_xchacha20poly1305.h",
-		"sodium/crypto_onetimeauth.h",
-		"sodium/crypto_auth.h",
-		"sodium/crypto_auth_hmacsha512.h",
-		"sodium/runtime.h",
-		"sodium/crypto_hash.h",
-		"sodium/crypto_verify_32.h",
-		"sodium/crypto_core_salsa208.h",
-		"sodium/crypto_core_hchacha20.h",
-		"sodium/crypto_generichash_blake2b.h",
-		"sodium/crypto_core_salsa2012.h",
-		"sodium/crypto_box_curve25519xchacha20poly1305.h",
-		"sodium/crypto_verify_16.h",
-		"sodium/private/ed25519_ref10_fe_51.h",
-		"sodium/crypto_stream.h",
-		"sodium/crypto_aead_aes256gcm.h",
-		"sodium/crypto_secretbox.h",
-		"sodium/crypto_core_ed25519.h",
-		"sodium/crypto_onetimeauth_poly1305.h",
-		"sodium/crypto_secretstream_xchacha20poly1305.h",
-		"sodium/crypto_scalarmult_curve25519.h",
-		"sodium/crypto_shorthash.h",
-		"sodium/crypto_hash_sha512.h",
-		"sodium/crypto_sign_ed25519.h",
-		"sodium/crypto_stream_xchacha20.h",
-		"sodium/crypto_scalarmult.h",
-		"sodium/crypto_pwhash.h",
-		"sodium/crypto_secretbox_xchacha20poly1305.h",
-		"sodium/crypto_stream_salsa20.h",
-		"sodium/private/common.h",
-		"sodium/randombytes_salsa20_random.h",
-		"sodium/private/ed25519_ref10_fe_25_5.h",
-		"sodium/crypto_auth_hmacsha512256.h",
-		"sodium.h",
-		"sodium/crypto_auth_hmacsha256.h",
-		"sodium/version.h",
-		"sodium/crypto_box.h",
-		"sodium/private/ed25519_ref10.h",
-		"sodium/crypto_core_salsa20.h",
-		"sodium/crypto_stream_salsa2012.h",
-		"sodium/crypto_verify_64.h",
-		"sodium/crypto_sign.h",
-		"sodium/crypto_hash_sha256.h",
-		"sodium/crypto_aead_chacha20poly1305.h",
-		"sodium/crypto_generichash.h",
-		"sodium/crypto_pwhash_scryptsalsa208sha256.h",
-		"sodium/crypto_scalarmult_ed25519.h",
-		"sodium/crypto_core_hsalsa20.h",
-		"sodium/crypto_stream_xsalsa20.h",
-		"sodium/crypto_kx.h",
-		"sodium/randombytes.h",
-		"sodium/core.h",
-		"sodium/crypto_pwhash_argon2i.h",
-		"sodium/crypto_secretbox_xsalsa20poly1305.h",
-		"sodium/crypto_sign_edwards25519sha512batch.h",
-		"sodium/crypto_stream_salsa208.h",
-		"sodium/crypto_box_curve25519xsalsa20poly1305.h",
-		"sodium/utils.h",
-		"sodium/crypto_pwhash_argon2id.h",
-		"sodium/private/sse2_64_32.h",
-		"sodium/crypto_shorthash_siphash24.h"
+		"sodium.h"
 	],
 	"libtasn1": []
 }
