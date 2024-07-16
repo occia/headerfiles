@@ -1,6 +1,31 @@
 {
 	"libfdk-aac": [
+		"aacdecoder_lib.h",
+
+		"aacenc_lib.h",
+
+		"ac_arith_coder.h",
+
+		"FDK_drcDecLib.h",
+
+		"tpdec_lib.h",
+
+		"tpenc_lib.h",
+
+		"pcm_utils.h",
+		"pcmdmx_lib.h",
+		"limiter.h",
+
+		"sac_dec_lib.h",
+
 		"sacenc_lib.h",
+
+		"sbrdecoder.h",
+
+		"sbr_encoder.h",
+
+		"FDK_audio.h",
+
 		"FDK_lpc.h",
 		"fft_rad2.h",
 		"FDK_matrixCalloc.h",
@@ -21,37 +46,19 @@
 		"FDK_crc.h",
 		"fft.h",
 		"autocorr2nd.h",
-		"aacenc_lib.h",
-		"tp_data.h",
-		"tpenc_lib.h",
-		"sbrdecoder.h",
-		"aacdecoder_lib.h",
-		"tp_data.h",
-		"tpdec_lib.h",
-		"sbr_encoder.h",
-		"FDK_drcDecLib.h",
-		"sac_dec_lib.h",
-		"pcm_utils.h",
-		"pcmdmx_lib.h",
-		"limiter.h",
-		"FDK_audio.h",
 		"machine_type.h",
 		"genericStds.h",
-		"syslib_channelMapDescr.h",
-		"ac_arith_coder.h"
+		"syslib_channelMapDescr.h"
 	],
 	"libfuse": [
-		"fuse_misc.h",
-		"mount_util.h",
-		"fuse_i.h",
 		"fuse.h",
-		"fuse_common.h",
-		"fuse_log.h",
 		"fuse_lowlevel.h",
+		"fuse_i.h",
+		"fuse_misc.h",
 		"fuse_kernel.h",
+		"mount_util.h",
 		"fuse_mount_compat.h",
-		"cuse_lowlevel.h",
-		"ada_fuzz_header.h"
+		"cuse_lowlevel.h"
 	],
 	"libpsl": [
 		"unicode/decimfmt.h",
