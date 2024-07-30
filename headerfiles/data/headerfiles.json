@@ -1004,7 +1004,8 @@
  ],
  "opusfile": [
   "fcntl.h",
-  "config.h"
+  "opusfile/config.h",
+  "opusfile/include/opusfile.h"
  ],
  "ostree": [
   "fcntl.h",
