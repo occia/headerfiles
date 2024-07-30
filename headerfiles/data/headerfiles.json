@@ -438,33 +438,7 @@
   "cbor.h"
  ],
  "libcoap": [
-  "coap3/coap_forward_decls.h",
-  "coap3/libcoap.h",
-  "coap3/coap.h",
-  "coap3/pdu.h",
-  "coap3/coap_net.h",
-  "coap3/block.h",
-  "coap3/coap_cache.h",
-  "coap3/coap_event.h",
-  "coap3/coap_net.h",
-  "coap3/coap_session.h",
-  "coap3/coap_uri.h",
-  "coap3/coap.h",
-  "coap3/coap_debug.h",
-  "coap3/coap_forward_decls.h",
-  "coap3/coap_option.h",
-  "coap3/coap_str.h",
-  "coap3/coap_address.h",
-  "coap3/coap_dtls.h",
-  "coap3/coap_io.h",
-  "coap3/coap_oscore.h",
-  "coap3/coap_subscribe.h",
-  "coap3/coap_async.h",
-  "coap3/coap_encode.h",
-  "coap3/coap_mem.h",
-  "coap3/coap_prng.h",
-  "coap3/coap_time.h",
-  "coap3/resource.h"
+  "coap3/coap.h"
  ],
  "libdwarf": [
   "fcntl.h"
