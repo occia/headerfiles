@@ -769,7 +769,7 @@
  ],
  "lwan": [
   "lwan.h",
-  "lwan-build-config.h",
+  "../../build/lwan-build-config.h",
   "lwan-mod-lua.h",
   "lwan-mod-redirect.h",
   "lwan-mod-response.h",
