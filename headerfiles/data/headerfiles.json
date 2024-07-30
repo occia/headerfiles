@@ -291,7 +291,7 @@
   "stdbool.h"
  ],
  "igraph": [
-  "igraph/igraph.h"
+  "igraph.h"
  ],
  "inchi": [
   "ichi.h",
