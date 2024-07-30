@@ -1000,7 +1000,7 @@
   "oniggnu.h"
  ],
  "openexr": [
-  "OpenEXR/openexr.h"
+  "openexr.h"
  ],
  "opusfile": [
   "fcntl.h",
