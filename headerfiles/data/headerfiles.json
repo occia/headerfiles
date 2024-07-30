@@ -911,13 +911,12 @@
   "unzip.h"
  ],
  "ndpi": [
-  "ndpi/ndpi_main.h",
-  "ndpi/ndpi_patricia_typedefs.h",
-  "ndpi/ndpi_unix.h",
-  "ndpi/ndpi_utils.h",
-  "ndpi/ndpi_config.h",
-  "ndpi/ndpi_classify.h",
-  "ndpi/ndpi_encryption.h"
+  "ndpi_api.h",
+  "ndpi_classify.h",
+  "ndpi_encryption.h",
+  "ndpi_patricia_typedefs.h",
+  "ndpi_replace_printf.h",
+  "ndpi_unix.h"
  ],
  "netcdf": [
   "netcdf.h",
