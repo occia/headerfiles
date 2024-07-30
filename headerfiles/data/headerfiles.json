@@ -584,8 +584,8 @@
   "pcap.h"
  ],
  "librdkafka": [
-  "librdkafka/rdkafka.h",
-  "librdkafka/rdkafka_mock.h"
+  "rdkafka.h",
+  "rdkafka_mock.h"
  ],
  "libredwg": [
   "dwg.h",
