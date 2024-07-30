@@ -785,23 +785,14 @@
   "lzio.h"
  ],
  "lwan": [
-  "lwan/lwan.h",
-  "lwan/hash.h",
-  "lwan/lwan-config.h",
-  "lwan/lwan-mod-response.h",
-  "lwan/lwan-strbuf.h",
-  "lwan/timeout.h",
-  "lwan/list.h",
-  "lwan/lwan-coro.h",
-  "lwan/lwan-mod-rewrite.h",
-  "lwan/lwan-template.h",
-  "lwan/lwan-array.h",
-  "lwan/lwan-mod-lua.h",
-  "lwan/lwan-mod-serve-files.h",
-  "lwan/lwan-trie.h",
-  "lwan/lwan-build-config.h",
-  "lwan/lwan-mod-redirect.h",
-  "lwan/lwan-status.h"
+  "lwan.h",
+  "lwan-build-config.h",
+  "lwan-mod-lua.h",
+  "lwan-mod-redirect.h",
+  "lwan-mod-response.h",
+  "lwan-mod-rewrite.h",
+  "lwan-mod-serve-files.h",
+  "lwan-template.h"
  ],
  "mbedtls": [
   "mbedtls/aes.h",
