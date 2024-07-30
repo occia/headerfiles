@@ -733,27 +733,10 @@
   "xls.h"
  ],
  "libyang": [
-  "libyang/config.h",
-  "libyang/context.h",
-  "libyang/dict.h",
-  "libyang/in.h",
-  "libyang/libyang.h",
-  "libyang/log.h",
-  "libyang/metadata.h",
-  "libyang/out.h",
-  "libyang/parser_data.h",
-  "libyang/parser_schema.h",
-  "libyang/plugins.h",
-  "libyang/plugins_exts.h",
-  "libyang/plugins_types.h",
-  "libyang/printer_data.h",
-  "libyang/printer_schema.h",
-  "libyang/set.h",
-  "libyang/tree.h",
-  "libyang/tree_data.h",
-  "libyang/tree_edit.h",
-  "libyang/tree_schema.h",
-  "libyang/version.h"
+  "libyang.h",
+  "hash_table.h",
+  "plugins_types.h",
+  "version.h"
  ],
  "lua": [
   "lapi.h",
