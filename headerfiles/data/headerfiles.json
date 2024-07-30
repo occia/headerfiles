@@ -1115,7 +1115,7 @@
   "utf8proc.h"
  ],
  "vlc": [
-  "vlc.h"
+  "vlc/vlc.h"
  ],
  "w3m": [
   "wc.h"
