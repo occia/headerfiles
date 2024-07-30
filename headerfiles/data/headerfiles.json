@@ -1068,7 +1068,7 @@
  "pupnp": [
   "list.h",
   "upnp.h",
-  "upnpconfig.h",
+  "../../build/upnp/inc/upnpconfig.h",
   "upnptools.h",
   "ixml.h",
   "ixmldebug.h"
