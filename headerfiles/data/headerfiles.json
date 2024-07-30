@@ -705,7 +705,8 @@
   "libtpms/tpm_types.h"
  ],
  "libusb": [
-  "assert.h"
+  "assert.h",
+  "libusb/libusb/libusb.h"
  ],
  "libvips": [
   "vips/vips.h"
