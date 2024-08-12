@@ -1,9 +1,9 @@
 # headerfiles
-Header file inference tool for LLM-based fuzz driver generation to OSS-Fuzz projects
+Header file inference tool for LLM-based fuzz driver generation to OSS-Fuzz projects. Currently, this project is for [OSS-Fuzz-Gen](https://github.com/google/oss-fuzz-gen) usage purpose and will be more general later.
 
 # API
 
-There are two APIs:
+There are three APIs:
 
 ```
 headerfiles.api
@@ -16,9 +16,13 @@ headerfiles.api
   - Usage: Get the inferred headers for a specific project.
   - Return value: A list of inferred headers for the project, their orders also matter.
 
+- get_build_script
+  - Usage: Get the build script for a specific project supported in OSS-FUZZ.
+  - Return value: The build script for the project.
+
 ```
 
-# Support List (68 projects till now)
+# Support List (50 projects till now)
 
 - [x] avahi
 - [x] bind9
@@ -27,55 +31,37 @@ headerfiles.api
 - [x] capstone
 - [x] coturn
 - [x] croaring
-- [x] dovecot
 - [x] igraph
-- [x] inchi
 - [x] kamailio
 - [x] krb5
 - [x] lcms
-- [x] libarchive
 - [x] libbpf
-- [x] libcbor
 - [x] libcoap
-- [x] libdwarf
 - [x] libevent
-- [x] libexif
 - [x] libfido2
-- [x] libfuse
-- [x] libgd
 - [x] libical
 - [x] libjpeg-turbo
 - [x] libpcap
 - [x] librdkafka
-- [x] libredwg
-- [x] libressl
 - [x] libsndfile
 - [x] libsodium
-- [x] libsrtp
 - [x] libssh
 - [x] libssh2
-- [x] libtasn1
 - [x] libtpms
 - [x] libusb
-- [x] libvips
 - [x] libvnc
-- [x] libwebsockets
 - [x] libxls
 - [x] libyang
-- [x] lua
 - [x] lwan
 - [x] mbedtls
 - [x] mdbtools
 - [x] minizip
 - [x] ndpi
-- [x] netcdf
 - [x] njs
 - [x] oniguruma
 - [x] openexr
 - [x] opusfile
-- [x] ostree
 - [x] picotls
-- [x] pidgin
 - [x] pjsip
 - [x] proftpd
 - [x] pupnp
@@ -88,6 +74,7 @@ headerfiles.api
 - [x] w3m
 - [x] wasm3
 - [x] zydis
+
 
 # Test
 

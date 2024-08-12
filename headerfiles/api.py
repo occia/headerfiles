@@ -14,26 +14,16 @@ def __load_headerfiles():
         headerjson = {}
     loaded = True
 
-def __get_headerfiles(proj: str) -> list[str]:
-    global loaded, headerjson
-    if not loaded:
-        __load_headerfiles()
-    return headerjson.get(proj, [])
-
-def __get_supported_projects() -> set[str]:
-    global loaded, headerjson
-    if not loaded:
-        __load_headerfiles()
-    return set(headerjson.keys())
-
-
 def is_supported_proj(proj: str) -> bool:
     """
     API function `is_supported_proj`
       - Usage: Check if a projection is supported by the API.
       - Return value: True if the projection is supported, False otherwise.
     """
-    return proj in __get_supported_projects()
+    global loaded, headerjson
+    if not loaded:
+        __load_headerfiles()
+    return set(headerjson.keys())
 
 def get_proj_headers(proj: str) -> list[str]:
     """
@@ -42,8 +32,26 @@ def get_proj_headers(proj: str) -> list[str]:
       - Return value: A list of inferred headers for the project, their orders also matter.
     """
     global loaded, headerjson
+    if not loaded:
+        __load_headerfiles()
+    if proj not in headerjson:
+        return []
+    return headerjson[proj]["headers"]
 
-    if not is_supported_proj(proj):
-        return None
+def get_build_script(proj: str, install_dir: str) -> str:
+    """
+    API function `get_build_script`
+      - Usage: Get the build script for a specific project supported in OSS-FUZZ.
+      - Return value: The build script for the project.
+    """
+    global loaded, headerjson
+    if not loaded:
+        __load_headerfiles()
+    
+    script = [ "# Begin of build script from headerfiles" ]
+    script.append(f"export HEADERFILES_CUSTOM_INSTALL_DIR=\"{install_dir}\"")
+    if proj in headerjson:
+        script.extend(headerjson[proj].get("build", []))
+    script.append("# End of build script from headerfiles")
 
-    return __get_headerfiles(proj)
+    return "\n".join(script) + "\n"
