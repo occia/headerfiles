@@ -51,6 +51,10 @@ def get_build_script(proj: str, install_dir: str) -> str:
     script = [ "# Begin of build script from headerfiles" ]
     script.append(f"export HEADERFILES_CUSTOM_INSTALL_DIR=\"{install_dir}\"")
     if proj in headerjson:
+        script.append(f"mkdir -p \"{install_dir}\"")
+        script.append(f"export CFLAGS=\" -I{install_dir}\" ")
+        script.append(f"export CXXFLAGS=\" -I{install_dir}\" ")
+
         script.extend(headerjson[proj].get("build", []))
     script.append("# End of build script from headerfiles")
 
