@@ -380,7 +380,15 @@
     },
     "coturn": {
         "headers": [
-            "fcntl.h"
+            "stdio.h",
+            "string.h",
+            "stdlib.h",
+            "fcntl.h",
+            "apputils.h",
+            "ns_turn_utils.h",
+            "stun_buffer.h",
+            "ns_turn_server.h",
+            "ns_turn_msg_addr.h"
         ],
         "build": [
             "mkdir -p /src/coturn/my_build",
@@ -389,7 +397,8 @@
             "make install",
             "make clean",
             "cd -",
-            "rm -rf /src/coturn/my_build"
+            "rm -rf /src/coturn/my_build",
+            "export CFLAGS=\"${CFLAGS} -I${HEADERFILES_CUSTOM_INSTALL_DIR}/include/turn -I${HEADERFILES_CUSTOM_INSTALL_DIR}/include/turn/client -I${HEADERFILES_CUSTOM_INSTALL_DIR}/include/turn/server \""
         ]
     },
     "croaring": {
