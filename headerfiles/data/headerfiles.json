@@ -27,7 +27,67 @@
             "avahi-core/lookup.h",
             "client.h"
         ],
-        "build": []
+        "build": [
+            "#!/bin/bash",
+            "",
+            "set -eux",
+            "",
+            "# Default flags for compilation",
+            "flags=\"-O1 -fno-omit-frame-pointer -g -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address,undefined\"",
+            "",
+            "export CC=${CC:-clang}",
+            "export CFLAGS=${CFLAGS:-$flags}",
+            "",
+            "export CXX=${CXX:-clang++}",
+            "export CXXFLAGS=${CXXFLAGS:-$flags}",
+            "",
+            "# Navigate to the Avahi project root directory",
+            "cd \"$(dirname -- \\\"$0\\\")/..\"",
+            "",
+            "# Custom install directory for header files and libraries",
+            "export HEADERFILES_CUSTOM_INSTALL_DIR=${HEADERFILES_CUSTOM_INSTALL_DIR:-\"/usr/local\"}",
+            "",
+            "# Update package lists and install dependencies",
+            "apt-get update",
+            "apt-get install -y autoconf gettext libtool m4 automake pkg-config libexpat-dev",
+            "",
+            "# Additional dependencies for i386 architecture",
+            "if [[ \"$ARCHITECTURE\" == i386 ]]; then",
+            "    apt-get install -y libexpat-dev:i386",
+            "fi",
+            "",
+            "# Additional undefined behavior sanitizer checks",
+            "if [[ \"$SANITIZER\" == undefined ]]; then",
+            "    additional_ubsan_checks=pointer-overflow,alignment",
+            "    UBSAN_FLAGS=\"-fsanitize=$additional_ubsan_checks -fno-sanitize-recover=$additional_ubsan_checks\"",
+            "    CFLAGS=\"$CFLAGS $UBSAN_FLAGS\"",
+            "    CXXFLAGS=\"$CXXFLAGS $UBSAN_FLAGS\"",
+            "fi",
+            "",
+            "# Disable consistency checks in pthread configuration",
+            "sed -i 's/check_inconsistencies=yes/check_inconsistencies=no/' common/acx_pthread.m4",
+            "",
+            "# Generate configuration scripts and configure the project",
+            "if ! ./autogen.sh \\",
+            "    --disable-stack-protector --disable-qt3 --disable-qt4 --disable-qt5 --disable-gtk \\",
+            "    --disable-gtk3 --disable-dbus --disable-gdbm --disable-libdaemon --disable-python \\",
+            "    --disable-manpages --disable-mono --disable-monodoc --disable-glib --disable-gobject \\",
+            "    --disable-libevent --disable-libsystemd \\",
+            "    --prefix=\"$HEADERFILES_CUSTOM_INSTALL_DIR\"; then",
+            "    cat config.log",
+            "    exit 1",
+            "fi",
+            "",
+            "# Compile the project using all available processors",
+            "make -j\"$(nproc)\" V=1",
+            "",
+            "# Install the compiled project to the custom install directory",
+            "make install",
+            "",
+            "make clean",
+            "# The header files and libraries should now be installed in ${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "echo \"Avahi has been installed to ${HEADERFILES_CUSTOM_INSTALL_DIR}\""
+        ]
     },
     "bind9": {
         "headers": [
@@ -228,38 +288,44 @@
             "isc/uv.h",
             "isc/work.h",
             "isc/xml.h",
-            "../isccc/include/isccc/alist.h",
-            "../isccc/include/isccc/base64.h",
-            "../isccc/include/isccc/cc.h",
-            "../isccc/include/isccc/ccmsg.h",
-            "../isccc/include/isccc/sexpr.h",
-            "../isccc/include/isccc/symtab.h",
-            "../isccc/include/isccc/symtype.h",
-            "../isccc/include/isccc/types.h",
-            "../isccc/include/isccc/util.h",
-            "../isccfg/include/isccfg/aclconf.h",
-            "../isccfg/include/isccfg/cfg.h",
-            "../isccfg/include/isccfg/check.h",
-            "../isccfg/include/isccfg/duration.h",
-            "../isccfg/include/isccfg/grammar.h",
-            "../isccfg/include/isccfg/kaspconf.h",
-            "../isccfg/include/isccfg/log.h",
-            "../isccfg/include/isccfg/namedconf.h",
-            "../ns/include/ns/client.h",
-            "../ns/include/ns/hooks.h",
-            "../ns/include/ns/interfacemgr.h",
-            "../ns/include/ns/listenlist.h",
-            "../ns/include/ns/log.h",
-            "../ns/include/ns/notify.h",
-            "../ns/include/ns/query.h",
-            "../ns/include/ns/server.h",
-            "../ns/include/ns/sortlist.h",
-            "../ns/include/ns/stats.h",
-            "../ns/include/ns/types.h",
-            "../ns/include/ns/update.h",
-            "../ns/include/ns/xfrout.h"
+            "isccc/alist.h",
+            "isccc/base64.h",
+            "isccc/cc.h",
+            "isccc/ccmsg.h",
+            "isccc/sexpr.h",
+            "isccc/symtab.h",
+            "isccc/symtype.h",
+            "isccc/types.h",
+            "isccc/util.h",
+            "isccfg/aclconf.h",
+            "isccfg/cfg.h",
+            "isccfg/check.h",
+            "isccfg/duration.h",
+            "isccfg/grammar.h",
+            "isccfg/kaspconf.h",
+            "isccfg/log.h",
+            "isccfg/namedconf.h",
+            "ns/client.h",
+            "ns/hooks.h",
+            "ns/interfacemgr.h",
+            "ns/listenlist.h",
+            "ns/log.h",
+            "ns/notify.h",
+            "ns/query.h",
+            "ns/server.h",
+            "ns/sortlist.h",
+            "ns/stats.h",
+            "ns/types.h",
+            "ns/update.h",
+            "ns/xfrout.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/bind9",
+            "./configure --disable-shared --enable-static --enable-developer --without-cmocka --without-zlib --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "bluez": {
         "headers": [
@@ -275,7 +341,13 @@
             "bluetooth/sdp.h",
             "bluetooth/sdp_lib.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/bluez",
+            "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} --enable-library",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "brotli": {
         "headers": [
@@ -285,19 +357,40 @@
             "brotli/shared_dictionary.h",
             "brotli/types.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/brotli",
+            "cmake . -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make -j$(nproc) brotlidec",
+            "make -j$(nproc) install",
+            "make clean",
+            "cd -"
+        ]
     },
     "capstone": {
         "headers": [
             "capstone/capstone.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/capstonenext",
+            "mkdir build1",
+            "cd build1",
+            "cmake -DCAPSTONE_BUILD_SHARED=0 --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}  ..",
+            "make -j$(nproc) install",
+            "make clean"
+        ]
     },
     "coturn": {
         "headers": [
             "fcntl.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /src/coturn/my_build",
+            "cd /src/coturn/my_build",
+            "cmake -DFUZZER=ON -DLIB_FUZZING_ENGINE=\\\"$LIB_FUZZING_ENGINE\\\" -DCMAKE_EXE_LINKER_FLAGS=\\\"-Wl,-rpath,'\\$ORIGIN/lib'\\\" -DWITH_MYSQL=OFF -Wno-dev --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}  ../.",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "croaring": {
         "headers": [
@@ -306,19 +399,34 @@
             "setjmp.h",
             "assert.h"
         ],
-        "build": []
+        "build": [
+            "cmake --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} ..",
+            "make install",
+            "make clean"
+        ]
     },
     "dovecot": {
         "headers": [
             "stdbool.h"
         ],
-        "build": []
+        "build": [
+            "./configure PANDOC=false --with-fuzzer=clang --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean"
+        ]
     },
     "igraph": {
         "headers": [
-            "igraph.h"
+            "igraph/igraph.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /src/igraph/build",
+            "cd /src/igraph/build",
+            "cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF -DCMAKE_BUILD_TYPE=None -DCMAKE_PREFIX_PATH=$DEPS_PATH -DFLEX_KEEP_LINE_NUMBERS=ON --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "inchi": {
         "headers": [
@@ -455,13 +563,27 @@
             "krb5/preauth_plugin.h",
             "krb5/pwqual_plugin.h"
         ],
-        "build": []
+        "build": [
+            "pushd src/",
+            "autoreconf",
+            "./configure CFLAGS=\"-fcommon $CFLAGS\" CXXFLAGS=\"-fcommon $CXXFLAGS\" --enable-static --disable-shared --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make",
+            "make install",
+            "make clean",
+            "popd"
+        ]
     },
     "lcms": {
         "headers": [
             "lcms2.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/lcms",
+            "./configure --enable-shared=no --enable-static --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "libarchive": {
         "headers": [
@@ -469,7 +591,15 @@
             "archive.h",
             "archive_entry.h"
         ],
-        "build": []
+        "build": [
+            "cd $SRC/libarchive",
+            "mkdir build3",
+            "cd build3",
+            "cmake -DCHECK_CRC_ON_SOLID_SKIP=1 -DDONT_FAIL_ON_CRC_ERROR=1 --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} ../",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "libbpf": {
         "headers": [
@@ -477,25 +607,51 @@
             "linux/types.h",
             "stdbool.h"
         ],
-        "build": []
+        "build": [
+            "make -C src BUILD_STATIC_ONLY=y V=1 clean",
+            "make -C src -j$(nproc) CFLAGS="-I$(pwd)/elfutils/libelf $CFLAGS" BUILD_STATIC_ONLY=y V=1 OBJDIR=/src/libbpf/jarvis-build DESTDIR=${HEADERFILES_CUSTOM_INSTALL_DIR} install",
+            "make -C clean"
+        ]
     },
     "libcbor": {
         "headers": [
             "cbor.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /src/libcbor/nbuild",
+            "cd /src/libcbor/nbuild",
+            "cmake -D CMAKE_BUILD_TYPE=Debug -D CMAKE_INSTALL_PREFIX=${HEADERFILES_CUSTOM_INSTALL_DIR} -D SANITIZE=OFF ..",
+            "make ",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "libcoap": {
         "headers": [
             "coap3/coap.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/libcoap",
+            "./configure --disable-doxygen --disable-manpages  --disable-dtls --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "libdwarf": {
         "headers": [
             "fcntl.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /src/libdwarf/build",
+            "cd /src/libdwarf/build",
+            "cmake --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} ..",
+            "make install",
+            "make clean",
+            "cd -",
+            "rm -rf /src/libdwarf/build"
+        ]
     },
     "libevent": {
         "headers": [
@@ -532,7 +688,20 @@
             "event2/rpc.h",
             "event2/util.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /src/libevent/build1",
+            "cd /src/libevent/build1",
+            "cmake -DEVENT__DISABLE_MBEDTLS=ON \\",
+            "      -DEVENT__DISABLE_OPENSSL=ON \\",
+            "      -DEVENT__LIBRARY_TYPE=STATIC \\",
+            "      -DEVENT__DISABLE_TESTS=ON \\",
+            "      -DEVENT__DISABLE_SAMPLES=ON \\",
+            "      --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} ../",
+            "make",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "libexif": {
         "headers": [
@@ -641,7 +810,11 @@
             "libical/vcc.h",
             "libical/vobject.h"
         ],
-        "build": []
+        "build": [
+            "cmake . -DSTATIC_ONLY=ON -DICAL_GLIB=False --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean"
+        ]
     },
     "libjpeg-turbo": {
         "headers": [
@@ -651,7 +824,16 @@
             "jpeglib.h",
             "turbojpeg.h"
         ],
-        "build": []
+        "build": [
+            "cmake . -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_STATIC=1 -DENABLE_SHARED=0 \\",
+            "   -DCMAKE_C_FLAGS_RELWITHDEBINFO=\"-g -DNDEBUG\" \\",
+            "   -DCMAKE_CXX_FLAGS_RELWITHDEBINFO=\"-g -DNDEBUG\" -DCMAKE_INSTALL_PREFIX=${HEADERFILES_CUSTOM_INSTALL_DIR} \\",
+            "   -DWITH_FUZZ=1 -DFUZZ_BINDIR=$OUT -DFUZZ_LIBRARY=$LIB_FUZZING_ENGINE \\",
+            "   -DFUZZER_SUFFIX=\"$FUZZER_SUFFIX\"",
+            "make",
+            "make install",
+            "make clean"
+        ]
     },
     "libpcap": {
         "headers": [
@@ -659,21 +841,40 @@
             "pcap-namedb.h",
             "pcap.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /src/libpcap/build1",
+            "cd /src/libpcap/build1",
+            "cmake --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} ..",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "librdkafka": {
         "headers": [
-            "rdkafka.h",
-            "rdkafka_mock.h"
+            "librdkafka/rdkafka.h",
+            "librdkafka/rdkafka_mock.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/librdkafka",
+            "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "libredwg": {
         "headers": [
             "dwg.h",
             "dwg_api.h"
         ],
-        "build": []
+        "build": [
+            "cd $SRC/libredwg",
+            "./configure --disable-shared --disable-bindings --enable-release --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "libressl": {
         "headers": [
@@ -754,13 +955,27 @@
             "openssl/rc2.h",
             "openssl/stack.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/libressl",
+            "cmake -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX \\",
+            "      -DCMAKE_C_FLAGS="$CFLAGS" -DCMAKE_CXX_FLAGS="$CXXFLAGS" \\",
+            "      $CMAKE_DEFINES --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} $SRC/libressl/",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "libsndfile": {
         "headers": [
             "sndfile.h"
         ],
-        "build": []
+        "build": [
+            "cd $SRC/libsndfile",
+            "./configure --disable-shared --enable-ossfuzzers --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make distclean",
+            "cd -"
+        ]
     },
     "libsodium": {
         "headers": [
@@ -768,8 +983,10 @@
         ],
         "build": [
             "cd /src/libsodium",
-            "./configure --enable-static LDFLAGS=\"$CXXFLAGS\" --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
-            "make -j$(nproc) install"
+            "./configure --enable-static LDFLAGS=\"$LDFLAGS $CXXFLAGS\" --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
         ]
     },
     "libsrtp": {
@@ -779,7 +996,13 @@
             "srtp2/cipher.h",
             "srtp2/srtp.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/libsrtp",
+            "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "libssh": {
         "headers": [
@@ -789,7 +1012,17 @@
             "libssh/sftp.h",
             "libssh/callbacks.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /tmp/build",
+            "cd /tmp/build",
+            "make clean",
+            "cmake -DCMAKE_C_COMPILER=\"$CC\" -DCMAKE_CXX_COMPILER=\"$CXX\" \\",
+            "    -DCMAKE_C_FLAGS=\"$CFLAGS\" -DCMAKE_CXX_FLAGS=\"$CXXFLAGS\" \\",
+            "    -DBUILD_SHARED_LIBS=OFF -DWITH_INSECURE_NONE=ON --install-prefix ${HEADERFILES_CUSTOM_INSTALL_DIR} $SRC/libssh",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "libssh2": {
         "headers": [
@@ -797,7 +1030,11 @@
             "libssh2_publickey.h",
             "libssh2_sftp.h"
         ],
-        "build": []
+        "build": [
+            "./configure --disable-shared --enable-ossfuzzers --disable-examples-build --enable-debug --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean"
+        ]
     },
     "libtasn1": {
         "headers": [
@@ -814,14 +1051,27 @@
             "libtpms/tpm_tis.h",
             "libtpms/tpm_types.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/libtpms",
+            "./configure --disable-shared --enable-static --with-openssl --with-tpm2 --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "libusb": {
         "headers": [
             "assert.h",
-            "libusb/libusb/libusb.h"
+            "libusb/libusb.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/libusb",
+            "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "libvips": {
         "headers": [
@@ -850,23 +1100,39 @@
             "lws_config.h",
             "libwebsockets.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /tmp/mybuild",
+            "cd /tmp/mybuild",
+            "cmake -DCMAKE_C_FLAGS=\"$CFLAGS\" -DCMAKE_CXX_FLAGS=\"$CXXFLAGS\" \\",
+            "      -DCMAKE_EXE_LINKER_FLAGS=\"$CFLAGS\" -DCMAKE_SHARED_LINKER_FLAGS=\"$CFLAGS\" --install-prefix ${HEADERFILES_CUSTOM_INSTALL_DIR} ..",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "libxls": {
         "headers": [
             "locale.h",
             "xls.h"
         ],
-        "build": []
+        "build": [
+            "./configure --enable-static --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean"
+        ]
     },
     "libyang": {
         "headers": [
-            "libyang.h",
-            "hash_table.h",
-            "plugins_types.h",
-            "version.h"
+            "libyang/libyang.h",
+            "libyang/hash_table.h",
+            "libyang/plugins_types.h",
+            "libyang/version.h"
         ],
-        "build": []
+        "build": [
+            "cmake -DENABLE_STATIC=ON --install-prefix ${HEADERFILES_CUSTOM_INSTALL_DIR} ../",
+            "make install",
+            "make clean"
+        ]
     },
     "lua": {
         "headers": [
@@ -902,16 +1168,22 @@
     },
     "lwan": {
         "headers": [
-            "lwan.h",
-            "../../build/lwan-build-config.h",
-            "lwan-mod-lua.h",
-            "lwan-mod-redirect.h",
-            "lwan-mod-response.h",
-            "lwan-mod-rewrite.h",
-            "lwan-mod-serve-files.h",
-            "lwan-template.h"
+            "lwan/lwan.h",
+            "lwan/lwan-build-config.h",
+            "lwan/lwan-mod-lua.h",
+            "lwan/lwan-mod-redirect.h",
+            "lwan/lwan-mod-response.h",
+            "lwan/lwan-mod-rewrite.h",
+            "lwan/lwan-mod-serve-files.h",
+            "lwan/lwan-template.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /tmp/build",
+            "cd /tmp/build",
+            "cmake -GNinja --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}  ..",
+            "ninja install",
+            "cd -"
+        ]
     },
     "mbedtls": {
         "headers": [
@@ -1009,14 +1281,27 @@
             "psa/crypto_types.h",
             "psa/crypto_values.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /src/mbedtls/build1",
+            "cd /src/mbedtls/build1",
+            "cmake -DENABLE_TESTING=OFF --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} ..",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "mdbtools": {
         "headers": [
             "mdbfakeglib.h",
             "mdbtools.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/mdbtools",
+            "./configure --enable-static --disable-man --disable-glib --disable-silent-rules --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "minizip": {
         "headers": [
@@ -1036,7 +1321,13 @@
             "mz_strm_split.h",
             "unzip.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/minizip-ng",
+            "cmake . -DCMAKE_C_FLAGS=\"$CFLAGS\" -DCMAKE_CXX_FLAGS=\"$CXXFLAGS\" -DMZ_BUILD_FUZZ_TESTS=ON --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} -DCMAKE_VERBOSE_MAKEFILE=ON",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "ndpi": {
         "headers": [
@@ -1047,7 +1338,13 @@
             "ndpi_replace_printf.h",
             "ndpi_unix.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/ndpi",
+            "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "netcdf": {
         "headers": [
@@ -1058,7 +1355,13 @@
             "netcdf_mem.h",
             "netcdf_meta.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /src/netcdf-c/build1",
+            "cmake --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} -DCMAKE_VERBOSE_MAKEFILE=ON  -DBUILD_SHARED_LIBS=OFF -DENABLE_HDF5=OFF -DENABLE_DAP=OFF ..",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "njs": {
         "headers": [
@@ -1137,7 +1440,13 @@
             "oniguruma.h",
             "oniggnu.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/oniguruma",
+            "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "openexr": {
         "headers": [
@@ -1148,10 +1457,16 @@
     "opusfile": {
         "headers": [
             "fcntl.h",
-            "opusfile/config.h",
-            "opusfile/include/opusfile.h"
+            "OpenEXR/openexr.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /src/openexr/build1",
+            "cd /src/openexr/build1",
+            "cmake ${CMAKE_SETTINGS[@]} --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} ..",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "ostree": {
         "headers": [
@@ -1159,7 +1474,13 @@
             "stdbool.h",
             "ostree.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/ostree",
+            "./configure --enable-static --without-selinux --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "picotls": {
         "headers": [
@@ -1179,7 +1500,30 @@
         "headers": [
             "purple.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/pidgin",
+            "./configure --disable-consoleui \\",
+            "            --disable-shared \\",
+            "            --disable-screensaver \\",
+            "            --disable-sm \\",
+            "            --disable-gtkspell \\",
+            "            --disable-gevolution \\",
+            "            --enable-gnutls=no \\",
+            "            --disable-gstreamer \\",
+            "            --disable-vv \\",
+            "            --disable-idn \\",
+            "            --disable-meanwhile \\",
+            "            --disable-avahi \\",
+            "            --disable-dbus \\",
+            "            --disable-perl \\",
+            "            --disable-tcl \\",
+            "            --disable-cyrus-sasl \\",
+            "            --disable-gtkui \\",
+            "            --enable-nss=no --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "pjsip": {
         "headers": [
@@ -1195,7 +1539,17 @@
             "pjsip_ua.h",
             "pjsua.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/pjsip",
+            "./configure \\",
+            "  --disable-ffmpeg --disable-ssl \\",
+            "  --disable-speex-aec --disable-speex-codec \\",
+            "  --disable-g7221-codec --disable-gsm-codec --disable-ilbc-codec \\",
+            "  --disable-resample --disable-libsrtp --disable-libwebrtc --disable-libyuv --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "proftpd": {
         "headers": [
@@ -1224,18 +1578,30 @@
             "table.h",
             "version.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/proftpd",
+            "./configure --enable-ctrls --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "pupnp": {
         "headers": [
             "list.h",
             "upnp.h",
-            "../../build/upnp/inc/upnpconfig.h",
+            "upnpconfig.h",
             "upnptools.h",
             "ixml.h",
             "ixmldebug.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/pupnp/build",
+            "cmake -DFUZZER=ON -DLIB_FUZZING_ENGINE=\"$LIB_FUZZING_ENGINE\" --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} ../",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "sleuthkit": {
         "headers": [
@@ -1266,19 +1632,40 @@
             "tsk/fs/tsk_hfs.h",
             "tsk/fs/tsk_iso9660.h"
         ],
-        "build": []
+        "build": [
+            "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}  --enable-static --disable-shared --disable-java --without-afflib --without-libewf --without-libvhdi --without-libvmdk",
+            "make install",
+            "make clean"
+        ]
     },
     "tidy-html5": {
         "headers": [
             "tidy.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /src/tidy-html5/build1",
+            "cd /src/tidy-html5/build1",
+            "cmake -GNinja -DCMAKE_INSTALL_PREFIX=${HEADERFILES_CUSTOM_INSTALL_DIR} ${SRC}/tidy-html5/",
+            "ninja",
+            "ninja install",
+            "cd -"
+        ]
     },
     "unicorn": {
         "headers": [
             "unicorn/unicorn.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /src/unicorn/build1",
+            "cd /src/unicorn/build1",
+            "cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=off --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make install",
+            "make clean",
+            "rm -rf /out/*",
+            "find /src/unicorn/build1 -type f ! -name '*.a' -delete",
+            "cd -",
+            "rm -rf /src/unicorn/build1"
+        ]
     },
     "unit": {
         "headers": [
@@ -1291,13 +1678,35 @@
         "headers": [
             "utf8proc.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /src/utf8proc/build1",
+            "cd /src/utf8proc/build1",
+            "cmake .. -DUTF8PROC_ENABLE_TESTING=ON -DLIB_FUZZING_ENGINE=\"$LIB_FUZZING_ENGINE\" --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "V=1 make install",
+            "make clean",
+            "cd -"
+        ]
     },
     "vlc": {
         "headers": [
             "vlc/vlc.h"
         ],
-        "build": []
+        "build": [
+            "cd /src/vlc",
+            "./configure --disable-ogg --disable-oggspots --disable-libxml2 --disable-lua \\",
+            "            --disable-shared \\",
+            "            --enable-static \\",
+            "            --enable-vlc=no \\",
+            "            --disable-avcodec \\",
+            "            --disable-swscale \\",
+            "            --disable-a52 \\",
+            "            --disable-xcb \\",
+            "            --disable-alsa \\",
+            "            --with-libfuzzer --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make -j$(nproc) install",
+            "make clean",
+            "cd -"
+        ]
     },
     "w3m": {
         "headers": [
@@ -1331,6 +1740,22 @@
             "Zydis/Utils.h",
             "Zydis/Zydis.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /src/zydis/build1",
+            "cd /src/zydis/build1",
+            "cmake                                       \\",
+            "    -DZYAN_FORCE_ASSERTS=ON                 \\",
+            "    -DZYDIS_BUILD_EXAMPLES=OFF              \\",
+            "    -DZYDIS_BUILD_TOOLS=OFF                 \\",
+            "    -DCMAKE_BUILD_TYPE=RelWithDebInfo       \\",
+            "    \"-DCMAKE_C_COMPILER=${CC}\"              \\",
+            "    \"-DCMAKE_CXX_COMPILER=${CXX}\"           \\",
+            "    \"-DCMAKE_C_FLAGS=${CFLAGS}\"             \\",
+            "    \"-DCMAKE_CXX_FLAGS=${CXXFLAGS}\"         \\",
+            "    --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} ..",
+            "make install",
+            "make clean",
+            "cd -"
+        ]
     }
 }
