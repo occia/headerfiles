@@ -609,7 +609,7 @@
         ],
         "build": [
             "make -C src BUILD_STATIC_ONLY=y V=1 clean",
-            "make -C src -j$(nproc) CFLAGS="-I$(pwd)/elfutils/libelf $CFLAGS" BUILD_STATIC_ONLY=y V=1 OBJDIR=/src/libbpf/jarvis-build DESTDIR=${HEADERFILES_CUSTOM_INSTALL_DIR} install",
+            "make -C src -j$(nproc) CFLAGS=\"-I$(pwd)/elfutils/libelf $CFLAGS\" BUILD_STATIC_ONLY=y V=1 OBJDIR=/src/libbpf/jarvis-build DESTDIR=${HEADERFILES_CUSTOM_INSTALL_DIR} install",
             "make -C clean"
         ]
     },
@@ -958,7 +958,7 @@
         "build": [
             "cd /src/libressl",
             "cmake -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX \\",
-            "      -DCMAKE_C_FLAGS="$CFLAGS" -DCMAKE_CXX_FLAGS="$CXXFLAGS" \\",
+            "      -DCMAKE_C_FLAGS=\"$CFLAGS\" -DCMAKE_CXX_FLAGS=\"$CXXFLAGS\" \\",
             "      $CMAKE_DEFINES --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} $SRC/libressl/",
             "make install",
             "make clean",
