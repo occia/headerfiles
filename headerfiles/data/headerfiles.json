@@ -318,6 +318,7 @@
         ],
         "build": [
             "cd /src/bind9",
+            "autoreconf -fi",
             "./configure --disable-shared --enable-static --enable-developer --without-cmocka --without-zlib --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make install",
             "make clean",
@@ -387,7 +388,8 @@
             "cmake -DFUZZER=ON -DLIB_FUZZING_ENGINE=\"$LIB_FUZZING_ENGINE\" -DCMAKE_EXE_LINKER_FLAGS=\"-Wl,-rpath,'\\$ORIGIN/lib'\" -DWITH_MYSQL=OFF -Wno-dev --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}  ../.",
             "make install",
             "make clean",
-            "cd -"
+            "cd -",
+            "rm -rf /src/coturn/my_build"
         ]
     },
     "croaring": {
