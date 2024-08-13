@@ -42,10 +42,7 @@
             "export CXXFLAGS=${CXXFLAGS:-$flags}",
             "",
             "# Navigate to the Avahi project root directory",
-            "cd \"$(dirname -- \\\"$0\\\")/..\"",
-            "",
-            "# Custom install directory for header files and libraries",
-            "export HEADERFILES_CUSTOM_INSTALL_DIR=${HEADERFILES_CUSTOM_INSTALL_DIR:-\"/usr/local\"}",
+            "cd \"$(dirname -- \"$0\")/..\"",
             "",
             "# Update package lists and install dependencies",
             "apt-get update",
@@ -79,7 +76,7 @@
             "fi",
             "",
             "# Compile the project using all available processors",
-            "make -j\"$(nproc)\" V=1",
+            "make V=1",
             "",
             "# Install the compiled project to the custom install directory",
             "make install",
@@ -343,6 +340,7 @@
         ],
         "build": [
             "cd /src/bluez",
+            "autoreconf -fi",
             "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} --enable-library",
             "make install",
             "make clean",
@@ -386,7 +384,7 @@
         "build": [
             "mkdir -p /src/coturn/my_build",
             "cd /src/coturn/my_build",
-            "cmake -DFUZZER=ON -DLIB_FUZZING_ENGINE=\\\"$LIB_FUZZING_ENGINE\\\" -DCMAKE_EXE_LINKER_FLAGS=\\\"-Wl,-rpath,'\\$ORIGIN/lib'\\\" -DWITH_MYSQL=OFF -Wno-dev --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}  ../.",
+            "cmake -DFUZZER=ON -DLIB_FUZZING_ENGINE=\"$LIB_FUZZING_ENGINE\" -DCMAKE_EXE_LINKER_FLAGS=\"-Wl,-rpath,'\\$ORIGIN/lib'\" -DWITH_MYSQL=OFF -Wno-dev --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}  ../.",
             "make install",
             "make clean",
             "cd -"
@@ -410,6 +408,7 @@
             "stdbool.h"
         ],
         "build": [
+            "./autogen.sh",
             "./configure PANDOC=false --with-fuzzer=clang --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make install",
             "make clean"
@@ -633,6 +632,7 @@
         ],
         "build": [
             "cd /src/libcoap",
+            "./autogen.sh",
             "./configure --disable-doxygen --disable-manpages  --disable-dtls --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make install",
             "make clean",
@@ -856,8 +856,9 @@
             "librdkafka/rdkafka_mock.h"
         ],
         "build": [
-            "cd /src/librdkafka",
-            "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "mkdir -p /src/librdkafka/build1",
+            "cd /src/librdkafka/build1",
+            "cmake --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} -DRDKAFKA_BUILD_STATIC=ON -DRDKAFKA_BUILD_EXAMPLES=OFF -DHAVE_REGEX=OFF ../",
             "make install",
             "make clean",
             "cd -"
@@ -870,6 +871,7 @@
         ],
         "build": [
             "cd $SRC/libredwg",
+            "sh autogen.sh",
             "./configure --disable-shared --disable-bindings --enable-release --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make install",
             "make clean",
@@ -970,9 +972,12 @@
             "sndfile.h"
         ],
         "build": [
+            "apt-get update",
+            "apt-get -y install autoconf autogen automake libtool pkg-config python",
             "cd $SRC/libsndfile",
+            "autoreconf -vif",
             "./configure --disable-shared --enable-ossfuzzers --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
-            "make install",
+            "make V=1 install",
             "make distclean",
             "cd -"
         ]
@@ -998,6 +1003,7 @@
         ],
         "build": [
             "cd /src/libsrtp",
+            "autoreconf -ivf",
             "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make install",
             "make clean",
@@ -1031,6 +1037,9 @@
             "libssh2_sftp.h"
         ],
         "build": [
+            "apt-get update",
+            "apt-get -y install automake libtool libssl-dev zlib1g-dev",
+            "autoreconf -fi",
             "./configure --disable-shared --enable-ossfuzzers --disable-examples-build --enable-debug --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make install",
             "make clean"
@@ -1053,6 +1062,7 @@
         ],
         "build": [
             "cd /src/libtpms",
+            "autoreconf -vfi",
             "./configure --disable-shared --enable-static --with-openssl --with-tpm2 --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make install",
             "make clean",
@@ -1066,6 +1076,7 @@
         ],
         "build": [
             "cd /src/libusb",
+            "./autogen.sh",
             "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make",
             "make install",
@@ -1116,6 +1127,11 @@
             "xls.h"
         ],
         "build": [
+            "if [ -f ./autogen.sh ]; then",
+            "./autogen.sh",
+            "else",
+            "./bootstrap",
+            "fi",
             "./configure --enable-static --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make install",
             "make clean"
@@ -1297,6 +1313,7 @@
         ],
         "build": [
             "cd /src/mdbtools",
+            "autoreconf -f -i",
             "./configure --enable-static --disable-man --disable-glib --disable-silent-rules --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make install",
             "make clean",
@@ -1339,11 +1356,21 @@
             "ndpi_unix.h"
         ],
         "build": [
-            "cd /src/ndpi",
-            "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "# build libpcap",
+            "tar -xvzf libpcap-1.9.1.tar.gz",
+            "cd libpcap-1.9.1",
+            "./configure --disable-shared",
+            "make -j$(nproc)",
             "make install",
             "make clean",
-            "cd -"
+            "cd ..",
+            "# build project",
+            "cd ndpi",
+            "RANLIB=llvm-ranlib LDFLAGS=\"-L/usr/local/lib -lpcap\" ./autogen.sh --enable-fuzztargets --with-only-libndpi --enable-tls-sigs --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make -j$(nproc)",
+            "make install",
+            "make clean",
+            "cd .."
         ]
     },
     "netcdf": {
@@ -1442,6 +1469,7 @@
         ],
         "build": [
             "cd /src/oniguruma",
+            "./autogen.sh",
             "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make install",
             "make clean",
@@ -1475,11 +1503,22 @@
             "ostree.h"
         ],
         "build": [
-            "cd /src/ostree",
+            "# Build glib with sanitizer support",
+            "cd glib",
+            "mkdir build",
+            "cd build",
+            "meson --prefix=/usr --buildtype=release -Db_lundef=false -Ddefault_library=static -Dlibmount=disabled",
+            "ninja",
+            "ninja install",
+            "cd ..",
+            "rm -rf build",
+            "# Build libostree",
+            "cd $SRC/ostree",
+            "env NOCONFIGURE=1 ./autogen.sh",
             "./configure --enable-static --without-selinux --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
-            "make install",
+            "make V=1 install",
             "make clean",
-            "cd -"
+            "cd /src"
         ]
     },
     "picotls": {
@@ -1501,7 +1540,48 @@
             "purple.h"
         ],
         "build": [
-            "cd /src/pidgin",
+            "# Place to keep dependencies for static linking",
+            "DEPS=/deps",
+            "mkdir -p ${DEPS}",
+            "# Build libffi",
+            "cd $SRC",
+            "tar xvfz libffi-3.2.1.tar.gz",
+            "cd libffi-3.2.1",
+            "./configure --disable-shared",
+            "make -j$(nproc)",
+            "export LIBFFI_LIBS=\"-L/src/libffi-3.2.1 libraries/ -lffi\"",
+            "cp ./x86_64-unknown-linux-gnu/.libs/libffi.a ${DEPS}/",
+            "# Build libxml2",
+            "cd $SRC/libxml2",
+            "./autogen.sh \\",
+            "    --disable-shared \\",
+            "    --without-debug \\",
+            "    --without-ftp \\",
+            "    --without-http \\",
+            "    --without-legacy \\",
+            "    --without-python",
+            "make -j$(nproc)",
+            "make install",
+            "cp .libs/libxml2.a ${DEPS}/",
+            "# Build glib",
+            "cd $SRC/glib",
+            "GLIB_BUILD=$WORK/meson",
+            "rm -rf $GLIB_BUILD",
+            "mkdir $GLIB_BUILD",
+            "meson $GLIB_BUILD \\",
+            "  -Db_lundef=false \\",
+            "  -Ddefault_library=static \\",
+            "  -Dlibmount=disabled",
+            "ninja -C $GLIB_BUILD",
+            "ninja -C $GLIB_BUILD install",
+            "cp ${GLIB_BUILD}/gobject/libgobject-2.0.a ${DEPS}/",
+            "cp ${GLIB_BUILD}/gmodule/libgmodule-2.0.a ${DEPS}/",
+            "cp ${GLIB_BUILD}/glib/libglib-2.0.a ${DEPS}/",
+            "# Build Pidgin",
+            "cd $SRC",
+            "tar -xf pidgin-2.14.10.tar.bz2",
+            "mv pidgin-2.14.10 pidgin",
+            "cd pidgin",
             "./configure --disable-consoleui \\",
             "            --disable-shared \\",
             "            --disable-screensaver \\",
@@ -1520,9 +1600,9 @@
             "            --disable-cyrus-sasl \\",
             "            --disable-gtkui \\",
             "            --enable-nss=no --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
-            "make install",
+            "make -j$(nproc) install",
             "make clean",
-            "cd -"
+            "cd /src"
         ]
     },
     "pjsip": {
@@ -1580,6 +1660,7 @@
         ],
         "build": [
             "cd /src/proftpd",
+            "export LDFLAGS=\"${CFLAGS}\"",
             "./configure --enable-ctrls --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make install",
             "make clean",
@@ -1633,6 +1714,12 @@
             "tsk/fs/tsk_iso9660.h"
         ],
         "build": [
+            "export CFLAGS=\"$CFLAGS -Wno-error=non-c-typedef-for-linkage\"",
+            "export CXXFLAGS=\"$CXXFLAGS -Wno-error=non-c-typedef-for-linkage\"",
+            "# Disable error on all warnings",
+            "sed -i 's/-Werror//g' ./tsk/util/Makefile.am",
+            "sed -i 's/-Werror//g' ./tsk/pool/Makefile.am",
+            "./bootstrap",
             "./configure --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}  --enable-static --disable-shared --disable-java --without-afflib --without-libewf --without-libvhdi --without-libvmdk",
             "make install",
             "make clean"
@@ -1693,6 +1780,25 @@
         ],
         "build": [
             "cd /src/vlc",
+            "# Use OSS-Fuzz environment rather than hardcoded setup.",
+            "sed -i 's/-fsanitize-coverage=trace-pc-guard//g' ./configure.ac",
+            "sed -i 's/-fsanitize-coverage=trace-cmp//g' ./configure.ac",
+            "sed -i 's/-fsanitize-coverage=trace-pc//g' ./configure.ac",
+            "sed -i 's/-lFuzzer//g'  ./configure.ac",
+            "# In order to build statically we avoid libxml and ogg plugins.",
+            "sed -i 's/..\\/..\\/lib\\/libvlc_internal.h/lib\\/libvlc_internal.h/g' ./test/src/input/decoder.c",
+            "sed -i 's/..\\/modules\\/libxml_plugin.la//g' ./test/Makefile.am",
+            "sed -i 's/..\\/modules\\/libogg_plugin.la//g' ./test/Makefile.am",
+            "sed -i 's/f(misc_xml_xml)//g' ./test/src/input/demux-run.c",
+            "sed -i 's/f(demux_ogg)//g' ./test/src/input/demux-run.c",
+            "# Ensure that we compile with the correct link flags.",
+            "RULE=vlc_demux_libfuzzer_LDADD",
+            "FUZZ_LDFLAGS=\"vlc_demux_libfuzzer_LDFLAGS=\\${LIB_FUZZING_ENGINE}\"",
+            "sed -i \"s/${RULE}/${FUZZ_LDFLAGS}\\n${RULE}/g\" ./test/Makefile.am",
+            "RULE=vlc_demux_dec_libfuzzer_LDADD",
+            "FUZZ_LDFLAGS=\"vlc_demux_dec_libfuzzer_LDFLAGS=\\${LIB_FUZZING_ENGINE}\"",
+            "sed -i \"s/${RULE}/${FUZZ_LDFLAGS}\\n${RULE}/g\" ./test/Makefile.am",
+            "./bootstrap",
             "./configure --disable-ogg --disable-oggspots --disable-libxml2 --disable-lua \\",
             "            --disable-shared \\",
             "            --enable-static \\",
