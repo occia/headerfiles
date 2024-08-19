@@ -698,7 +698,7 @@
             "coap3/coap.h"
         ],
         "build": [
-            "export LDFLAGS=\"${LDFLAGS}\" -lpthread ",
+            "export LDFLAGS=\"${LDFLAGS} -lpthread \"",
             "pushd /src/libcoap",
             "./autogen.sh",
             "./configure --disable-doxygen --disable-manpages  --disable-dtls --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
