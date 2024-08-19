@@ -881,6 +881,9 @@
         "build": [
             "cmake . -DSTATIC_ONLY=ON -DICAL_GLIB=False --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make install",
+            "make clean",
+            "cmake . -DSTATIC_ONLY=ON -DICAL_GLIB=False --install-prefix=/usr/local",
+            "make install",
             "make clean"
         ]
     },
