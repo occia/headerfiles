@@ -896,14 +896,7 @@
             "turbojpeg.h"
         ],
         "build": [
-            "cmake . -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_STATIC=1 -DENABLE_SHARED=0 \\",
-            "   -DCMAKE_C_FLAGS_RELWITHDEBINFO=\"-g -DNDEBUG\" \\",
-            "   -DCMAKE_CXX_FLAGS_RELWITHDEBINFO=\"-g -DNDEBUG\" -DCMAKE_INSTALL_PREFIX=${HEADERFILES_CUSTOM_INSTALL_DIR} \\",
-            "   -DWITH_FUZZ=1 -DFUZZ_BINDIR=$OUT -DFUZZ_LIBRARY=$LIB_FUZZING_ENGINE \\",
-            "   -DFUZZER_SUFFIX=\"$FUZZER_SUFFIX\"",
-            "make",
-            "make install",
-            "make clean"
+            "# build.sh have already done `make install`"
         ]
     },
     "libpcap": {
@@ -1090,9 +1083,9 @@
             "libssh/callbacks.h"
         ],
         "build": [
+            "export LDFLAGS=\"${LDFLAGS} -lpthread \"",
             "mkdir -p /tmp/build",
             "cd /tmp/build",
-            "make clean",
             "cmake -DCMAKE_C_COMPILER=\"$CC\" -DCMAKE_CXX_COMPILER=\"$CXX\" \\",
             "    -DCMAKE_C_FLAGS=\"$CFLAGS\" -DCMAKE_CXX_FLAGS=\"$CXXFLAGS\" \\",
             "    -DBUILD_SHARED_LIBS=OFF -DWITH_INSECURE_NONE=ON --install-prefix ${HEADERFILES_CUSTOM_INSTALL_DIR} $SRC/libssh",
@@ -1136,7 +1129,7 @@
             "autoreconf -vfi",
             "./configure --disable-shared --enable-static --with-openssl --with-tpm2 --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
             "make install",
-            "make clean",
+            "make distclean",
             "cd -"
         ]
     },
@@ -1216,9 +1209,14 @@
             "libyang/version.h"
         ],
         "build": [
+            "pushd libyang",
+            "git checkout devel",
+            "mkdir -p build1",
+            "cd build1",
             "cmake -DENABLE_STATIC=ON --install-prefix ${HEADERFILES_CUSTOM_INSTALL_DIR} ../",
             "make install",
-            "make clean"
+            "make clean",
+            "popd"
         ]
     },
     "lua": {
@@ -1267,8 +1265,9 @@
         "build": [
             "mkdir -p /tmp/build",
             "cd /tmp/build",
-            "cmake -GNinja --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}  ..",
-            "ninja install",
+            "cmake -GNinja --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} $SRC/lwan",
+            "ninja -v liblwan.a",
+            "ninja -v install",
             "cd -"
         ]
     },
@@ -1551,20 +1550,36 @@
         "headers": [
             "openexr.h"
         ],
-        "build": []
+        "build": [
+            "mkdir -p /tmp/build",
+            "cd /tmp/build",
+            "CMAKE_SETTINGS=(",
+            "  \"-D BUILD_SHARED_LIBS=OFF\"         # Build static libraries only",
+            "  \"-D BUILD_TESTING=OFF\"             # Or tests",
+            "  \"-D OPENEXR_INSTALL_EXAMPLES=OFF\"  # Or examples",
+            "  \"-D OPENEXR_LIB_SUFFIX=\"           # Don't append the version number to library files",
+            ")",
+            "cmake --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} $SRC/openexr ${CMAKE_SETTINGS[@]}",
+            "make -j$(nproc)",
+            "make install",
+            "make clean",
+            "cd -",
+            "export CFLAGS=\"$CFLAGS -I /build_install_dir/include/Imath -I /build_install_dir/include/OpenEXR \"",
+            "export CXXFLAGS=\"$CXXFLAGS -I /build_install_dir/include/Imath -I /build_install_dir/include/OpenEXR \""
+        ]
     },
     "opusfile": {
         "headers": [
             "fcntl.h",
-            "OpenEXR/openexr.h"
+            "opus/opusfile.h"
         ],
         "build": [
-            "mkdir -p /src/openexr/build1",
-            "cd /src/openexr/build1",
-            "cmake ${CMAKE_SETTINGS[@]} --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} ..",
+            "./autogen.sh",
+            "./configure --enable-static --disable-shared --disable-doc --enable-assertions --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make",
             "make install",
-            "make clean",
-            "cd -"
+            "ldconfig",
+            "make clean"
         ]
     },
     "ostree": {
@@ -1604,7 +1619,14 @@
             "picotls/openssl.h",
             "picotls/ptlsbcrypt.h"
         ],
-        "build": []
+        "build": [
+            "export LDFLAGS=\"${LDFLAGS} -lpthread \"",
+            "pushd $SRC/picotls",
+            "cmake --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} -DBUILD_FUZZER=ON -DOSS_FUZZ=ON .",
+            "make",
+            "make clean",
+            "popd"
+        ]
     },
     "pidgin": {
         "headers": [
@@ -1691,15 +1713,15 @@
             "pjsua.h"
         ],
         "build": [
-            "cd /src/pjsip",
             "./configure \\",
             "  --disable-ffmpeg --disable-ssl \\",
             "  --disable-speex-aec --disable-speex-codec \\",
             "  --disable-g7221-codec --disable-gsm-codec --disable-ilbc-codec \\",
             "  --disable-resample --disable-libsrtp --disable-libwebrtc --disable-libyuv --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
+            "make dep",
+            "make --ignore-errors",
             "make install",
-            "make clean",
-            "cd -"
+            "make clean"
         ]
     },
     "proftpd": {
@@ -1731,9 +1753,9 @@
         ],
         "build": [
             "cd /src/proftpd",
-            "export LDFLAGS=\"${CFLAGS}\"",
+            "export LDFLAGS=\"${LDFLAGS} \"",
             "./configure --enable-ctrls --prefix=${HEADERFILES_CUSTOM_INSTALL_DIR}",
-            "make install",
+            "make",
             "make clean",
             "cd -"
         ]
@@ -1748,6 +1770,7 @@
             "ixmldebug.h"
         ],
         "build": [
+            "mkdir -p /src/pupnp/build",
             "cd /src/pupnp/build",
             "cmake -DFUZZER=ON -DLIB_FUZZING_ENGINE=\"$LIB_FUZZING_ENGINE\" --install-prefix=${HEADERFILES_CUSTOM_INSTALL_DIR} ../",
             "make install",
